@@ -9,7 +9,7 @@ Creation of a ROS2 package and modification of the example publisher and sunscri
 
 ## Assumptions
 * OS: Ubuntu Linux Focal (20.04) 64-bit
-* ROS2 Distro: Humble
+* ROS2 Distro: Humble Hawksbill
 * ROS2 Workspace name: ros2_ws 
 * ROS2 Installation Directory: ros2_humble
 
