@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>First Publisher/Subscriber</description>
   <maintainer email="adarshmalapaka98@gmail.com">adarsh</maintainer>
-  <license>MIT License</license>
+  <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
