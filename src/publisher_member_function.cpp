@@ -19,14 +19,27 @@ MinimalPublisher::MinimalPublisher()
        publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
        timer_ = this->create_wall_timer(500ms,
         std::bind(&MinimalPublisher::timer_callback, this));
+
+       auto serviceCallbackPtr = std::bind(&MinimalPublisher::change_message,
+                      this, std::placeholders::_1, std::placeholders::_2);
+       service_ = create_service<beginner_tutorials::srv::UpdateMessage>(
+        "update_message", serviceCallbackPtr);
 }
 
 void MinimalPublisher::timer_callback() {
     auto message = std_msgs::msg::String();
-    message.data = "Custom String Message for Printing, ID:  "
-             + std::to_string(count_++);
+    message.data = "Custom String Message for Printing, ID:  " +
+            std::to_string(count_++);
     RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
     publisher_->publish(message);
+}
+
+void MinimalPublisher::change_message(
+     const std::shared_ptr<beginner_tutorials::srv::UpdateMessage::Request> req,
+     std::shared_ptr<beginner_tutorials::srv::UpdateMessage::Response> resp) {
+    resp->new_message = req->data;
+    RCLCPP_INFO(this->get_logger(), "Request: '%s'", req->data.c_str());
+    RCLCPP_INFO(this->get_logger(), "Resp: '%s'", resp->new_message.c_str());
 }
 
 int main(int argc, char * argv[]) {
