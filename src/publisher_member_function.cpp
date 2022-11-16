@@ -12,7 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <string>
+
 #include "../include/beginner_tutorials/MinimalPublisher.hpp"
+
+using REQ = const std::shared_ptr<beginner_tutorials
+                ::srv::UpdateMessage::Request>;
+using RESP = std::shared_ptr<beginner_tutorials
+                ::srv::UpdateMessage::Response>;
+
+// Global string to hold published message data
+auto publish_message = std::string("Custom String Message for Printing");
 
 MinimalPublisher::MinimalPublisher()
     : Node("minimal_publisher"), count_(0) {
@@ -28,18 +38,23 @@ MinimalPublisher::MinimalPublisher()
 
 void MinimalPublisher::timer_callback() {
     auto message = std_msgs::msg::String();
-    message.data = "Custom String Message for Printing, ID:  " +
-            std::to_string(count_++);
+    auto id_str = std::string(", ID: ");
+    message.data = publish_message + id_str + std::to_string(count_++);
     RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
     publisher_->publish(message);
 }
 
-void MinimalPublisher::change_message(
-     const std::shared_ptr<beginner_tutorials::srv::UpdateMessage::Request> req,
-     std::shared_ptr<beginner_tutorials::srv::UpdateMessage::Response> resp) {
-    resp->new_message = req->data;
-    RCLCPP_INFO(this->get_logger(), "Request: '%s'", req->data.c_str());
-    RCLCPP_INFO(this->get_logger(), "Resp: '%s'", resp->new_message.c_str());
+void MinimalPublisher::change_message(REQ req, RESP resp) {
+    if (req->data == std::string("None")) {
+        RCLCPP_WARN(this->get_logger(), "Received an empty request string!");
+    } else {
+        resp->new_message = req->data;
+        publish_message = resp->new_message;
+        RCLCPP_INFO(this->get_logger(), "Request Received: '%s'",
+                                req->data.c_str());
+        RCLCPP_INFO(this->get_logger(), "Response Sent: '%s'",
+                                resp->new_message.c_str());
+    }
 }
 
 int main(int argc, char * argv[]) {
