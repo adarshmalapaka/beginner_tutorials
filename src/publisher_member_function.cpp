@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <signal.h>
 #include <string>
 
 #include "../include/beginner_tutorials/MinimalPublisher.hpp"
@@ -37,11 +38,18 @@ MinimalPublisher::MinimalPublisher()
 }
 
 void MinimalPublisher::timer_callback() {
-    auto message = std_msgs::msg::String();
-    auto id_str = std::string(", ID: ");
-    message.data = publish_message + id_str + std::to_string(count_++);
-    RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-    publisher_->publish(message);
+    if (rclcpp::ok()) {
+        // RCLCPP_ERROR(this->get_logger(), "Manual shutdown of the node!");
+    // } else {
+        auto message = std_msgs::msg::String();
+        auto id_str = std::string(", ID: ");
+        message.data = publish_message + id_str + std::to_string(count_++);
+        RCLCPP_INFO(this->get_logger(), "Publishing: '%s'",
+                    message.data.c_str());
+        publisher_->publish(message);
+    } else {
+        RCLCPP_ERROR(this->get_logger(), "Manual shutdown of the node!");
+    }
 }
 
 void MinimalPublisher::change_message(REQ req, RESP resp) {
@@ -57,7 +65,15 @@ void MinimalPublisher::change_message(REQ req, RESP resp) {
     }
 }
 
+void node_shutdown_cb(int signum) {
+    if (signum == 2) {
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"),
+                        "Manual shutdown of the node!");
+    }
+}
+
 int main(int argc, char * argv[]) {
+  signal(SIGINT, node_shutdown_cb);
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<MinimalPublisher>());
   rclcpp::shutdown();
