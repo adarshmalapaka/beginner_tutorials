@@ -12,20 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <chrono>
 #include <signal.h>
 
 #include "../include/beginner_tutorials/MinimalPublisher.hpp"
 
 MinimalPublisher::MinimalPublisher()
     : Node("minimal_publisher"), count_(0) {
-       publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
-       timer_ = this->create_wall_timer(500ms,
-        std::bind(&MinimalPublisher::timer_callback, this));
+
+       auto pub_freq_desc = rcl_interfaces::msg::ParameterDescriptor();
+       pub_freq_desc.description = "Sets the Publisher frequency in Hz.";
+       this->declare_parameter("pub_freq", 2.0, pub_freq_desc);
+       auto pub_freq = this->get_parameter("pub_freq")
+                    .get_parameter_value().get<std::float_t>();
+
+       auto queue_size_desc = rcl_interfaces::msg::ParameterDescriptor();
+       queue_size_desc.description = "Sets the size of the Queue.";
+       this->declare_parameter("queue_size", 10.0, queue_size_desc);
+       auto queue_size = this->get_parameter("queue_size")
+                    .get_parameter_value().get<std::float_t>();
+
+       publisher_ = this->create_publisher<std_msgs::msg::String>
+                    ("topic", queue_size);
+
+       timer_ = this->create_wall_timer(std::chrono::milliseconds(
+                    static_cast<int>(1000 / pub_freq)),
+                    std::bind(&MinimalPublisher::timer_callback, this));
 
        auto serviceCallbackPtr = std::bind(&MinimalPublisher::change_message,
-                      this, std::placeholders::_1, std::placeholders::_2);
+                    this, std::placeholders::_1, std::placeholders::_2);
+
        service_ = create_service<beginner_tutorials::srv::UpdateMessage>(
-        "update_message", serviceCallbackPtr);
+                    "update_message", serviceCallbackPtr);
 
        publish_message_ = "Custom String Message for Printing";
 }

@@ -17,8 +17,16 @@
 
 MinimalSubscriber::MinimalSubscriber()
   : Node("minimal_subscriber") {
+
+     auto queue_size_desc = rcl_interfaces::msg::ParameterDescriptor();
+     queue_size_desc.description = "Sets the size of the Queue.";
+     this->declare_parameter("queue_size", 10.0, queue_size_desc);
+     auto queue_size = this->get_parameter("queue_size")
+                    .get_parameter_value().get<std::float_t>();
+
      subscription_ = this->create_subscription<std_msgs::msg::String>(
-       "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
+              "topic", queue_size,
+              std::bind(&MinimalSubscriber::topic_callback, this, _1));
 
      if (this->count_publishers("topic") == 0) {
         RCLCPP_WARN_STREAM(this->get_logger(),
