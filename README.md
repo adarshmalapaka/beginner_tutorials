@@ -139,6 +139,8 @@ ros2 launch beginner_tutorials pubsub_service_launch.yaml pub_freq:=-5.0
 
 ```
 
+Note: Running the above launch file should automatically display DEBUG and INFO messages. 
+
 ## Results
 
 ### rqt_console
