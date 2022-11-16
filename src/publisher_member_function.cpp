@@ -39,35 +39,33 @@ MinimalPublisher::MinimalPublisher()
 
 void MinimalPublisher::timer_callback() {
     if (rclcpp::ok()) {
-        // RCLCPP_ERROR(this->get_logger(), "Manual shutdown of the node!");
-    // } else {
         auto message = std_msgs::msg::String();
         auto id_str = std::string(", ID: ");
         message.data = publish_message + id_str + std::to_string(count_++);
-        RCLCPP_INFO(this->get_logger(), "Publishing: '%s'",
-                    message.data.c_str());
+        RCLCPP_INFO_STREAM(this->get_logger(), "Publishing: " << message.data);
         publisher_->publish(message);
     } else {
-        RCLCPP_ERROR(this->get_logger(), "Manual shutdown of the node!");
+        RCLCPP_ERROR_STREAM(this->get_logger(), "Manual shutdown of the node!");
     }
 }
 
 void MinimalPublisher::change_message(REQ req, RESP resp) {
     if (req->data == std::string("None")) {
-        RCLCPP_WARN(this->get_logger(), "Received an empty request string!");
+        RCLCPP_WARN_STREAM(this->get_logger(),
+                    "Received an empty request string!");
     } else {
         resp->new_message = req->data;
         publish_message = resp->new_message;
-        RCLCPP_INFO(this->get_logger(), "Request Received: '%s'",
-                                req->data.c_str());
-        RCLCPP_INFO(this->get_logger(), "Response Sent: '%s'",
-                                resp->new_message.c_str());
+        RCLCPP_INFO_STREAM(this->get_logger(),
+                    "Request Received: " << req->data);
+        RCLCPP_INFO_STREAM(this->get_logger(),
+                    "Response Sent: " << resp->new_message);
     }
 }
 
 void node_shutdown_cb(int signum) {
     if (signum == 2) {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"),
+        RCLCPP_ERROR_STREAM(rclcpp::get_logger("rclcpp"),
                         "Manual shutdown of the node!");
     }
 }

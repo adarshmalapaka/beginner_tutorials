@@ -12,6 +12,7 @@
 #pragma once
 
 #include <memory>
+#include <rclcpp/logging.hpp>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
