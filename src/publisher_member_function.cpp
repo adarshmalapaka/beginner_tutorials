@@ -30,6 +30,8 @@
 
 MinimalPublisher::MinimalPublisher()
     : Node("minimal_publisher"), count_(0) {
+       // Set the logger level to DEBUG from INFO
+       this->get_logger().set_level(rclcpp::Logger::Level::Debug);
 
        RCLCPP_DEBUG_STREAM(this->get_logger(),
                     "Retrieving frequency and queue size parameter values");
@@ -123,9 +125,6 @@ void node_shutdown_cb(int signum) {
 int main(int argc, char * argv[]) {
   // To catch Ctrl+C keypress interrupt
   signal(SIGINT, node_shutdown_cb);
-
-  // Set the logger level to DEBUG from INFO
-  rclcpp::get_logger("rclcpp").set_level(rclcpp::Logger::Level::Debug);
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<MinimalPublisher>());
   rclcpp::shutdown();

@@ -28,6 +28,8 @@
 
 MinimalSubscriber::MinimalSubscriber()
   : Node("minimal_subscriber") {
+     // Set the logger level to DEBUG from INFO
+     this->get_logger().set_level(rclcpp::Logger::Level::Debug);
      RCLCPP_DEBUG_STREAM(this->get_logger(),
                     "Retrieving queue size parameter value");
 
@@ -64,9 +66,6 @@ void MinimalSubscriber::topic_callback(
 
 
 int main(int argc, char * argv[]) {
-    // Set the logger level to DEBUG from INFO
-  rclcpp::get_logger("rclcpp").set_level(rclcpp::Logger::Level::Debug);
-
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<MinimalSubscriber>());
   rclcpp::shutdown();
