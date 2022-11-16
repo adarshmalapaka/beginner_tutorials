@@ -81,8 +81,8 @@ ros2 launch beginner_tutorials pubsub_service_launch.yaml
 ### Setting Parameters
 
 The available parameters to change are:
-* pub_freq: double Frequency (in Hz) of the publisher node.
-* queue_size: double Queue size of the nodes (publisher and subscriber).
+* ```pub_freq```: double Frequency (in Hz) of the publisher node.
+* ```queue_size```: double Queue size of the nodes (publisher and subscriber).
 
 Syntax to launch the nodes with parameters: 
 ```
@@ -111,6 +111,33 @@ cd <path-to-ROS2-workspace>/ros2_ws
 ros2 service call /update_message beginner_tutorials/srv/UpdateMessage "{data: Updated message to publish}"
 ```
 Enter ```Ctrl+c``` in each terminal to stop the nodes from spinning.
+
+### Log Output
+Run the following to colorize the log outputs while using launching the nodes:
+```
+export RCUTILS_COLORIZED_OUTPUT=1
+```
+
+To display a WARN log message:
+```
+ros2 launch beginner_tutorials pubsub_service_launch.yaml
+
+# In another terminal
+ros2 service call /update_message beginner_tutorials/srv/UpdateMessage "{data:}"
+```
+
+To display an ERROR log message:
+```
+ros2 launch beginner_tutorials pubsub_service_launch.yaml
+
+# Press Ctrl+C
+```
+
+To display a FATAL log message:
+```
+ros2 launch beginner_tutorials pubsub_service_launch.yaml pub_freq:=-5.0
+
+```
 
 ## Results
 
