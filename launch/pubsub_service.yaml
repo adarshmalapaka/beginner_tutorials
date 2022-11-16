@@ -1,0 +1,27 @@
+launch:
+
+- arg:
+    name: "queue_size"
+    default: "10.0"
+
+- arg:
+    name: "pub_freq"
+    default: "10.0"
+
+- node:
+    pkg: "beginner_tutorials"
+    exec: "talker"
+    name: "minimal_publisher"
+    param:
+    -
+      name: "pub_freq"
+      value: "$(var queue_size)"
+
+- node:
+    pkg: "beginner_tutorials"
+    exec: "listener"
+    name: "minimal_subscriber"
+    param:
+    -
+      name: "queue_size"
+      value: "$(var queue_size)"
