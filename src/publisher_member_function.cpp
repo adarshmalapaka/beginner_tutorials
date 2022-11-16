@@ -13,17 +13,8 @@
 // limitations under the License.
 
 #include <signal.h>
-#include <string>
 
 #include "../include/beginner_tutorials/MinimalPublisher.hpp"
-
-using REQ = const std::shared_ptr<beginner_tutorials
-                ::srv::UpdateMessage::Request>;
-using RESP = std::shared_ptr<beginner_tutorials
-                ::srv::UpdateMessage::Response>;
-
-// Global string to hold published message data
-auto publish_message = std::string("Custom String Message for Printing");
 
 MinimalPublisher::MinimalPublisher()
     : Node("minimal_publisher"), count_(0) {
@@ -35,13 +26,15 @@ MinimalPublisher::MinimalPublisher()
                       this, std::placeholders::_1, std::placeholders::_2);
        service_ = create_service<beginner_tutorials::srv::UpdateMessage>(
         "update_message", serviceCallbackPtr);
+
+       publish_message_ = "Custom String Message for Printing";
 }
 
 void MinimalPublisher::timer_callback() {
     if (rclcpp::ok()) {
         auto message = std_msgs::msg::String();
         auto id_str = std::string(", ID: ");
-        message.data = publish_message + id_str + std::to_string(count_++);
+        message.data = publish_message_ + id_str + std::to_string(count_++);
         RCLCPP_INFO_STREAM(this->get_logger(), "Publishing: " << message.data);
         publisher_->publish(message);
     } else {
@@ -55,7 +48,7 @@ void MinimalPublisher::change_message(REQ req, RESP resp) {
                     "Received an empty request string!");
     } else {
         resp->new_message = req->data;
-        publish_message = resp->new_message;
+        publish_message_ = resp->new_message;
         RCLCPP_INFO_STREAM(this->get_logger(),
                     "Request Received: " << req->data);
         RCLCPP_INFO_STREAM(this->get_logger(),

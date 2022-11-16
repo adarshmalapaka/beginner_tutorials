@@ -13,6 +13,7 @@
 
 #include <chrono>
 #include <memory>
+#include <string>
 #include <rclcpp/logging.hpp>
 
 #include "rclcpp/rclcpp.hpp"
@@ -20,6 +21,10 @@
 #include "beginner_tutorials/srv/update_message.hpp"
 
 using namespace std::chrono_literals;
+using REQ = const std::shared_ptr<beginner_tutorials
+                ::srv::UpdateMessage::Request>;
+using RESP = std::shared_ptr<beginner_tutorials
+                ::srv::UpdateMessage::Response>;
 
 /**
  * @brief Class (subclass of Node) and uses std::bind() to register a member function as a callback from the timer.
@@ -30,12 +35,11 @@ class MinimalPublisher : public rclcpp::Node {
     MinimalPublisher();
 
  private:
-  void timer_callback();
-  void change_message(
-    const std::shared_ptr<beginner_tutorials::srv::UpdateMessage::Request> req,
-    std::shared_ptr<beginner_tutorials::srv::UpdateMessage::Response> resp);
-  rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
-  rclcpp::Service<beginner_tutorials::srv::UpdateMessage>::SharedPtr service_;
-  size_t count_;
+    void timer_callback();
+    void change_message(REQ req, RESP resp);
+    rclcpp::TimerBase::SharedPtr timer_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+    rclcpp::Service<beginner_tutorials::srv::UpdateMessage>::SharedPtr service_;
+    size_t count_;
+    std::string publish_message_;
 };
