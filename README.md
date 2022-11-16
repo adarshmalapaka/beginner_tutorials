@@ -5,7 +5,7 @@
 
 ## Overview 
 
-Creation of a ROS2 package and modification of the example publisher and sunscriber scripts to publish a custom string message, whilst following the Google C++ Style Guide. 
+Inclusion of a ROS2 service server to modify the published message with the previously created ROS2 package containing the example publisher and subscriber scripts to publish a custom string message, whilst following the Google C++ Style Guide. The nodes are run using a YAML based launch file with appropriate logging. 
 
 ## Assumptions
 * OS: Ubuntu Linux Focal (20.04) 64-bit
@@ -17,6 +17,8 @@ Creation of a ROS2 package and modification of the example publisher and sunscri
 * ```ament_cmake```
 * ```rclcpp```
 * ```std_msgs```
+* ```ros2launch```
+* ```rosidl_default_generators```
 
 ## ROS2 Installation (source)
 
@@ -25,104 +27,9 @@ The following steps walkthrough the procedure to install the lastest LTS version
 If your system is running Ubuntu Linux Jammy (22.04) 64-bit, you may skip to the binary installation of ROS2 Humble using 
 [this link.](http://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
 
-### Set locale
-```
-locale  # check for UTF-8
+Step-by-step instructions for installing ROS2 Humble and setting up the workspace can also be found in the ```ros_pub_sub``` branch of this repository. 
 
-sudo apt update && sudo apt install locales
-sudo locale-gen en_US en_US.UTF-8
-sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-export LANG=en_US.UTF-8
-
-locale  # verify settings
-```
-
-### ROS2 apt repository
-```
-apt-cache policy | grep universe
-```
-This should result in an output like:
-```
-500 http://us.archive.ubuntu.com/ubuntu jammy/universe amd64 Packages
-    release v=22.04,o=Ubuntu,a=jammy,n=jammy,l=Ubuntu,c=universe,b=amd64
-```
-
-If such an output is not visible, run:
-```
-sudo apt install software-properties-common
-sudo add-apt-repository universe
-```
-
-Authorize the GPG key with apt and add the repository to the sources list.
-```
-sudo apt update && sudo apt install curl gnupg lsb-release
-sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
-```
-
-### Install ROS2 and Development Tools
-```
-sudo apt update && sudo apt install -y \
-  build-essential \
-  cmake \
-  git \
-  python3-colcon-common-extensions \
-  python3-flake8 \
-  python3-flake8-docstrings \
-  python3-pip \
-  python3-pytest \
-  python3-pytest-cov \
-  python3-rosdep \
-  python3-setuptools \
-  python3-vcstool \
-  wget
-````
-```
-python3 -m pip install -U \
-   flake8-blind-except \
-   flake8-builtins \
-   flake8-class-newline \
-   flake8-comprehensions \
-   flake8-deprecated \
-   flake8-import-order \
-   flake8-quotes \
-   pytest-repeat \
-   pytest-rerunfailures
-```
-
-If you get any error about "pytest", try the below command instead of the above snippet:
-
-```
-python3 -m pip install -U \
-   flake8-blind-except \
-   flake8-builtins \
-   flake8-class-newline \
-   flake8-comprehensions \
-   flake8-deprecated \
-   flake8-import-order \
-   flake8-quotes \
-   pytest-repeat \
-   pytest-rerunfailures==8.0
-```   
-
-### ROS2 Code
-
-Create an installation workspace and clone all repos. It is to be noted that it is assumed this installation workspace is created in the ```home``` directory of your system. If you have created it elsewhere, include the entire path to this directory. 
-
-```
-mkdir -p ~/ros2_humble/src
-cd ~/ros2_humble
-vcs import --input https://raw.githubusercontent.com/ros2/ros2/humble/ros2.repos src
-
-sudo apt upgrade
-sudo rosdep init
-rosdep update
-rosdep install --from-paths src --ignore-src -y --skip-keys "fastcdr rti-connext-dds-6.0.1 urdfdom_headers"
-
-colcon build --symlink-install
-```
-
-NOTE: The previous step can take about 2+ hours to run. For a system with Intel Core i5 11th generation, it took nearly 6 hours.
+NOTE: The above procedure can take about 2+ hours to run. For a system with Intel Core i5 11th generation, it took nearly 6 hours.
 
 ### Environment Setup
 ```
@@ -162,26 +69,59 @@ colcon build --packages-select beginner_tutorials
 
 ## Run Instructions
 
-### Publisher Demo 
+### Publisher-Subscriber
+
+In a terminal, navigate to your ROS2 workspace (```ros2_ws```) and source the setup files,
+```
+cd <path-to-ROS2-workspace>/ros2_ws
+. install/setup.bash
+ros2 launch beginner_tutorials pubsub_service_launch.yaml
+```
+
+### Setting Parameters
+
+The available parameters to change are:
+* pub_freq: double Frequency (in Hz) of the publisher node.
+* queue_size: double Queue size of the nodes (publisher and subscriber).
+
+Syntax to launch the nodes with parameters: 
+```
+ros2 launch beginner_tutorials pubsub_service_launch.yaml <param1>:=<value> <param2>:=<value>
+```
+
 In a new terminal, navigate to your ROS2 workspace (```ros2_ws```) and source the setup files,
 ```
 cd <path-to-ROS2-workspace>/ros2_ws
 . install/setup.bash
-ros2 run beginner_tutorials talker
+ros2 launch beginner_tutorials pubsub_service_launch.yaml pub_freq:=10.0
 ```
 
-### Subscriber Demo
-In another terminal, navigate to your ROS2 workspace (```ros2_ws```) and source the setup files,
+### Service 
+
+In a new terminal, navigate to your ROS2 workspace (```ros2_ws```) and source the setup files. Launch the above publisher and subscriber nodes to run the server (Service: ```/update_message```) using, 
 ```
 cd <path-to-ROS2-workspace>/ros2_ws
 . install/setup.bash
-ros2 run beginner_tutorials listener
+ros2 launch beginner_tutorials pubsub_service_launch.yaml
 ```
-
+In another terminal navigate to your ROS2 workspace (```ros2_ws```) and source the setup files and run the client to the service (Service: ```/update_message```),
+```
+cd <path-to-ROS2-workspace>/ros2_ws
+. install/setup.bash
+ros2 service call /update_message beginner_tutorials/srv/UpdateMessage "{data: Updated message to publish}"
+```
 Enter ```Ctrl+c``` in each terminal to stop the nodes from spinning.
 
-
 ## Results
+
+### rqt_console
+
+To view the log messages in ```rqt_console```, open a terminal and run:
+```
+ros2 run rqt_console rqt_console
+```
+
+Two screenshots of this window are provided in the ```/results``` directory.
 
 ### cpplint 
 Change to the root directory of the package, ```/beginner_tutorials```, and run:
