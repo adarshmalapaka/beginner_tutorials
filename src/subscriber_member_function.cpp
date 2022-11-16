@@ -18,11 +18,21 @@
 MinimalSubscriber::MinimalSubscriber()
   : Node("minimal_subscriber") {
 
+     RCLCPP_DEBUG_STREAM(this->get_logger(),
+                    "Retrieving queue size parameter value");
      auto queue_size_desc = rcl_interfaces::msg::ParameterDescriptor();
      queue_size_desc.description = "Sets the size of the Queue.";
      this->declare_parameter("queue_size", 10.0, queue_size_desc);
      auto queue_size = this->get_parameter("queue_size")
                     .get_parameter_value().get<std::float_t>();
+
+     if (queue_size < 0) {
+          RCLCPP_FATAL_STREAM(this->get_logger(),
+                    "Invalid queue size set for the node!");
+     } else if (queue_size == 0) {
+          RCLCPP_ERROR_STREAM(this->get_logger(),
+                    "Zero queue size set for the node!");
+     }
 
      subscription_ = this->create_subscription<std_msgs::msg::String>(
               "topic", queue_size,
@@ -41,6 +51,7 @@ void MinimalSubscriber::topic_callback(
 
 
 int main(int argc, char * argv[]) {
+  rclcpp::get_logger("rclcpp").set_level(rclcpp::Logger::Level::Debug);
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<MinimalSubscriber>());
   rclcpp::shutdown();

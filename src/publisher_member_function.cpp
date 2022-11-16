@@ -20,6 +20,9 @@
 MinimalPublisher::MinimalPublisher()
     : Node("minimal_publisher"), count_(0) {
 
+       RCLCPP_DEBUG_STREAM(this->get_logger(),
+                    "Retrieving frequency and queue size parameter values");
+
        auto pub_freq_desc = rcl_interfaces::msg::ParameterDescriptor();
        pub_freq_desc.description = "Sets the Publisher frequency in Hz.";
        this->declare_parameter("pub_freq", 2.0, pub_freq_desc);
@@ -31,6 +34,22 @@ MinimalPublisher::MinimalPublisher()
        this->declare_parameter("queue_size", 10.0, queue_size_desc);
        auto queue_size = this->get_parameter("queue_size")
                     .get_parameter_value().get<std::float_t>();
+
+       if (pub_freq < 0) {
+          RCLCPP_FATAL_STREAM(this->get_logger(),
+                    "Invalid frequency set for the publisher!");
+       } else if (pub_freq == 0) {
+          RCLCPP_ERROR_STREAM(this->get_logger(),
+                    "Zero frequency set for the publisher!");
+       }
+
+       if (queue_size < 0) {
+          RCLCPP_FATAL_STREAM(this->get_logger(),
+                    "Invalid queue size set for the node!");
+       } else if (queue_size == 0) {
+          RCLCPP_ERROR_STREAM(this->get_logger(),
+                    "Zero queue size set for the node!");
+       }
 
        publisher_ = this->create_publisher<std_msgs::msg::String>
                     ("topic", queue_size);
@@ -83,6 +102,7 @@ void node_shutdown_cb(int signum) {
 
 int main(int argc, char * argv[]) {
   signal(SIGINT, node_shutdown_cb);
+  rclcpp::get_logger("rclcpp").set_level(rclcpp::Logger::Level::Debug);
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<MinimalPublisher>());
   rclcpp::shutdown();
