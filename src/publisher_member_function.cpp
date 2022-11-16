@@ -12,6 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @file publisher_member_function.cpp
+ * @author Adarsh Malapaka (adarshmalapaka98@gmail.com)
+ * @brief Implementation of ROS2 Publisher node running a Service server with parameter handling and logging.
+ * @version 0.2
+ * @date 2022-11-16
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <chrono>
 #include <signal.h>
 
@@ -23,12 +34,14 @@ MinimalPublisher::MinimalPublisher()
        RCLCPP_DEBUG_STREAM(this->get_logger(),
                     "Retrieving frequency and queue size parameter values");
 
+       // Argument/Parameter for setting publisher frequency (in Hz)
        auto pub_freq_desc = rcl_interfaces::msg::ParameterDescriptor();
        pub_freq_desc.description = "Sets the Publisher frequency in Hz.";
        this->declare_parameter("pub_freq", 2.0, pub_freq_desc);
        auto pub_freq = this->get_parameter("pub_freq")
                     .get_parameter_value().get<std::float_t>();
 
+       // Argument/Parameter for setting queue size of the buffer.
        auto queue_size_desc = rcl_interfaces::msg::ParameterDescriptor();
        queue_size_desc.description = "Sets the size of the Queue.";
        this->declare_parameter("queue_size", 10.0, queue_size_desc);
@@ -68,6 +81,7 @@ MinimalPublisher::MinimalPublisher()
 }
 
 void MinimalPublisher::timer_callback() {
+    // Check if the node is not shutdown.
     if (rclcpp::ok()) {
         auto message = std_msgs::msg::String();
         auto id_str = std::string(", ID: ");
@@ -80,6 +94,7 @@ void MinimalPublisher::timer_callback() {
 }
 
 void MinimalPublisher::change_message(REQ req, RESP resp) {
+    // If empty request message is received from the Service client.
     if (req->data == std::string("None")) {
         RCLCPP_WARN_STREAM(this->get_logger(),
                     "Received an empty request string!");
@@ -93,6 +108,11 @@ void MinimalPublisher::change_message(REQ req, RESP resp) {
     }
 }
 
+/**
+ * @brief Callback function to detect when Ctrl+C is pressed.
+ * 
+ * @param signum SIGINT Interrupt ID (2 -> Ctrl+C)
+ */
 void node_shutdown_cb(int signum) {
     if (signum == 2) {
         RCLCPP_ERROR_STREAM(rclcpp::get_logger("rclcpp"),
@@ -101,10 +121,14 @@ void node_shutdown_cb(int signum) {
 }
 
 int main(int argc, char * argv[]) {
+  // To catch Ctrl+C keypress interrupt
   signal(SIGINT, node_shutdown_cb);
+
+  // Set the logger level to DEBUG from INFO
   rclcpp::get_logger("rclcpp").set_level(rclcpp::Logger::Level::Debug);
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<MinimalPublisher>());
   rclcpp::shutdown();
+
   return 0;
 }

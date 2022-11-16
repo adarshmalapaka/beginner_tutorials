@@ -11,17 +11,29 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/**
+ * @file subscriber_member_function.cpp
+ * @author Adarsh Malapaka (adarshmalapaka98@gmail.com)
+ * @brief Implementation of ROS2 Subscriber node with parameter handling and logging.
+ * @version 0.2
+ * @date 2022-11-16
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
+#include <string>
 
 #include "../include/beginner_tutorials/MinimalSubscriber.hpp"
-#include <string>
 
 MinimalSubscriber::MinimalSubscriber()
   : Node("minimal_subscriber") {
-
      RCLCPP_DEBUG_STREAM(this->get_logger(),
                     "Retrieving queue size parameter value");
+
+     // Argument/Parameter for setting queue size of the buffer.
      auto queue_size_desc = rcl_interfaces::msg::ParameterDescriptor();
-     queue_size_desc.description = "Sets the size of the Queue.";
+     queue_size_desc.description = "Sets the size of the Queue (Default 10.0).";
      this->declare_parameter("queue_size", 10.0, queue_size_desc);
      auto queue_size = this->get_parameter("queue_size")
                     .get_parameter_value().get<std::float_t>();
@@ -38,6 +50,7 @@ MinimalSubscriber::MinimalSubscriber()
               "topic", queue_size,
               std::bind(&MinimalSubscriber::topic_callback, this, _1));
 
+     // Check if there are publishers to the subscribed topic.
      if (this->count_publishers("topic") == 0) {
         RCLCPP_WARN_STREAM(this->get_logger(),
               "No publisher found on the subscribed topic!");
@@ -51,7 +64,9 @@ void MinimalSubscriber::topic_callback(
 
 
 int main(int argc, char * argv[]) {
+    // Set the logger level to DEBUG from INFO
   rclcpp::get_logger("rclcpp").set_level(rclcpp::Logger::Level::Debug);
+
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<MinimalSubscriber>());
   rclcpp::shutdown();

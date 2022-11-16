@@ -6,7 +6,7 @@ launch:
 
 - arg:
     name: "pub_freq"
-    default: "1.0"
+    default: "2.0"
 
 - node:
     pkg: "beginner_tutorials"
