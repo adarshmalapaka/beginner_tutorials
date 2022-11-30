@@ -16,18 +16,11 @@
 #include <stdlib.h>
 #include <rclcpp/rclcpp.hpp>
 
-#include "../include/beginner_tutorials/MinimalPublisher.hpp"
+#include "std_msgs/msg/string.hpp"
+
+// #include "../include/beginner_tutorials/MinimalPublisher.hpp"
 
 class TaskTalker : public testing::Test {
- public:
-  void SetUp() override {
-    rclcpp::init(0, nullptr);
-  }
-
-  void TearDown() override {
-    rclcpp::shutdown();
-  }
-
  protected:
   rclcpp::Node::SharedPtr node_;
 };
@@ -38,5 +31,5 @@ TEST_F(TaskTalker, test_num_publishers) {
                     ("chatter", 10.0);
 
   auto num_pub = node_->count_publishers("chatter");
-  EXPECT_EQ(1, num_pub);
+  EXPECT_EQ(1, static_cast<int>(num_pub));
 }

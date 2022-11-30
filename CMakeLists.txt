@@ -25,6 +25,36 @@ ament_target_dependencies(talker rclcpp std_msgs geometry_msgs tf2 tf2_ros)
 add_executable(listener src/subscriber_member_function.cpp include/beginner_tutorials/MinimalSubscriber.hpp)
 ament_target_dependencies(listener rclcpp std_msgs)
 
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  find_package(ament_lint_auto REQUIRED)
+
+  # the following lines skip linters
+  set(ament_cmake_cppcheck_FOUND TRUE)
+  set(ament_cmake_copyright_FOUND TRUE)
+  set(ament_cmake_cpplint_FOUND TRUE)
+  set(ament_cmake_flake8_FOUND TRUE)
+  set(ament_cmake_uncrustify_FOUND TRUE)
+  set(ament_cmake_xmllint_FOUND TRUE)
+  set(ament_cmake_lint_cmake_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+
+  # Run all lint tests in package.xml except those listed above
+  ament_lint_auto_find_test_dependencies()
+
+  # Add a gtest executable
+  set(TESTFILES
+    test/main.cpp
+    test/test_talker.cpp)
+  ament_add_gtest(test_${PROJECT_NAME} ${TESTFILES})
+  ament_target_dependencies(test_${PROJECT_NAME} rclcpp std_msgs)
+
+  install(TARGETS
+  test_${PROJECT_NAME}
+  DESTINATION lib/${PROJECT_NAME})
+
+endif()
+
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/UpdateMessage.srv"
  )
