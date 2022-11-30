@@ -11,7 +11,7 @@ launch:
 - node:
     pkg: "beginner_tutorials"
     exec: "talker"
-    name: "minimal_publisher"
+    name: "talker"
     param:
     -
       name: "pub_freq"
@@ -20,7 +20,7 @@ launch:
 - node:
     pkg: "beginner_tutorials"
     exec: "listener"
-    name: "minimal_subscriber"
+    name: "listener"
     param:
     -
       name: "queue_size"
