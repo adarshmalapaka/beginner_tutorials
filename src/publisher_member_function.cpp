@@ -29,7 +29,7 @@
 #include "../include/beginner_tutorials/MinimalPublisher.hpp"
 
 MinimalPublisher::MinimalPublisher()
-    : Node("minimal_publisher"), count_(0) {
+    : Node("talker"), count_(0) {
        // Set the logger level to DEBUG from INFO
        this->get_logger().set_level(rclcpp::Logger::Level::Debug);
 
@@ -67,7 +67,7 @@ MinimalPublisher::MinimalPublisher()
        }
 
        publisher_ = this->create_publisher<std_msgs::msg::String>
-                    ("topic", queue_size);
+                    ("chatter", queue_size);
 
        timer_ = this->create_wall_timer(std::chrono::milliseconds(
                     static_cast<int>(1000 / pub_freq)),

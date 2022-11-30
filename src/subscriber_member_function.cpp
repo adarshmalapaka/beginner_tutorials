@@ -27,7 +27,7 @@
 #include "../include/beginner_tutorials/MinimalSubscriber.hpp"
 
 MinimalSubscriber::MinimalSubscriber()
-  : Node("minimal_subscriber") {
+  : Node("listener") {
      // Set the logger level to DEBUG from INFO
      this->get_logger().set_level(rclcpp::Logger::Level::Debug);
      RCLCPP_DEBUG_STREAM(this->get_logger(),
@@ -49,11 +49,11 @@ MinimalSubscriber::MinimalSubscriber()
      }
 
      subscription_ = this->create_subscription<std_msgs::msg::String>(
-              "topic", queue_size,
+              "chatter", queue_size,
               std::bind(&MinimalSubscriber::topic_callback, this, _1));
 
      // Check if there are publishers to the subscribed topic.
-     if (this->count_publishers("topic") == 0) {
+     if (this->count_publishers("chatter") == 0) {
         RCLCPP_WARN_STREAM(this->get_logger(),
               "No publisher found on the subscribed topic!");
      }
