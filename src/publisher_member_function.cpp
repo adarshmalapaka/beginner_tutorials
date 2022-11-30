@@ -80,6 +80,27 @@ MinimalPublisher::MinimalPublisher()
                     "update_message", serviceCallbackPtr);
 
        publish_message_ = "Custom String Message for Printing";
+
+       tf_static_broadcaster_ = std::make_shared<
+                tf2_ros::StaticTransformBroadcaster>(this);
+
+       geometry_msgs::msg::TransformStamped t;
+       t.header.stamp = this->get_clock()->now();
+       t.header.frame_id = "world";
+       t.child_frame_id = "talk";
+       // Translation component in meters
+       t.transform.translation.x = 0.2;
+       t.transform.translation.y = 0.1;
+       t.transform.translation.z = 0.5;
+
+       // Quaternion corresponding to XYZ Euler Angles
+       // of (0.1, 0.1, 0.1) rad
+       t.transform.rotation.x = 0.0523491;
+       t.transform.rotation.y = 0.0473595;
+       t.transform.rotation.z = 0.0523491;
+       t.transform.rotation.w = 0.9961306;
+
+       tf_static_broadcaster_->sendTransform(t);
 }
 
 void MinimalPublisher::timer_callback() {
