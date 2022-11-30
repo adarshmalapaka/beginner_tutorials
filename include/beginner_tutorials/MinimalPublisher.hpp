@@ -45,4 +45,5 @@ class MinimalPublisher : public rclcpp::Node {
     rclcpp::Service<beginner_tutorials::srv::UpdateMessage>::SharedPtr service_;
     size_t count_;
     std::string publish_message_;  // String to hold the message to be published
+    std::shared_ptr<tf2_ros::StaticTransformBroadcaster> tf_static_broadcaster_;
 };
