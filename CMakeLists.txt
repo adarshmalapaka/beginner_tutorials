@@ -37,6 +37,8 @@ if(BUILD_TESTING)
   set(ament_cmake_uncrustify_FOUND TRUE)
   set(ament_cmake_xmllint_FOUND TRUE)
   set(ament_cmake_lint_cmake_FOUND TRUE)
+  set(ament_cmake_linter_FOUND TRUE)
+  set(ament_cmake_pep257_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 
   # Run all lint tests in package.xml except those listed above
@@ -47,7 +49,7 @@ if(BUILD_TESTING)
     test/main.cpp
     test/test_talker.cpp)
   ament_add_gtest(test_${PROJECT_NAME} ${TESTFILES})
-  ament_target_dependencies(test_${PROJECT_NAME} rclcpp std_msgs)
+  ament_target_dependencies(test_${PROJECT_NAME} rclcpp std_msgs geometry_msgs tf2 tf2_ros)
 
   install(TARGETS
   test_${PROJECT_NAME}
