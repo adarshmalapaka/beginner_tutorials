@@ -1,11 +1,11 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ---
 
-# ROS2 Publisher/Subscriber 
+# ROS2 Package with Publisher-Subscriber, Services, and tf2 broadcaster.
 
 ## Overview 
 
-Inclusion of a ROS2 service server to modify the published message with the previously created ROS2 package containing the example publisher and subscriber scripts to publish a custom string message, whilst following the Google C++ Style Guide. The nodes are run using a YAML based launch file with appropriate logging. 
+Inclusion of a tf2 broadcaster and Level 2 integration gtests in addition to the previously created ROS2 service server to modify the published message and ROS2 package containing the example publisher and subscriber scripts to publish a custom string message, whilst following the Google C++ Style Guide.
 
 ## Assumptions
 * OS: Ubuntu Linux Focal (20.04) 64-bit
@@ -17,6 +17,9 @@ Inclusion of a ROS2 service server to modify the published message with the prev
 * ```ament_cmake```
 * ```rclcpp```
 * ```std_msgs```
+* ```geometry_msgs```
+* ```tf2```
+* ```tf2_ros```
 * ```ros2launch```
 * ```rosidl_default_generators```
 
@@ -69,6 +72,58 @@ colcon build --packages-select beginner_tutorials
 
 ## Run Instructions
 
+Note: Whenever you are instructed to open a terminal in the steps below, ensure you source the setup files from your ROS2 Humble installation, if built from source.
+ 
+### Wk11: tf2 Broadcaster with Verification
+
+In a terminal, navigate to your ROS2 workspace (```ros2_ws```) and source the setup files,
+```
+cd <path-to-ROS2-workspace>/ros2_ws
+. install/setup.bash
+ros2 run beginner_tutorials talker
+```
+
+In another terminal, source your ROS workspace as mentioned before and run:
+ros2 run tf2_ros tf2_echo world talk
+
+Alternatively, in a other terminal, you may run the folwogin and open the corresponding saved file ```frames.pdf```:
+```
+ros2 run tf2_tools view_frames -o frames
+```
+
+### Wk11: Level 2 GTests
+
+To view the gtest results for the ROS2 publisher and tf2 broadcaster, run the following in your ```ros_ws``` workspace,
+```
+colcon test --event-handlers console_direct+ --packages-select beginner_tutorials
+```
+
+### Wk11: Rosbag
+
+To launch ROS2 bag and record all topics, run the following in a terminal sourced with your ROS workspace (```ros2_ws```) and change to the ```/results/bag_files``` directory:
+```
+ros2 launch beginner_tutorials rosbag_launch.py record_all_topics:=true
+```
+
+where, ```record_all_topics``` is an argument that enables bag recording when set to ```true```. Default value is ```true```.
+The bag file is saved with the filename ```all_topics_bag_0.db3``` in the ```/results/bag_files/all_topics_bag``` directory, if recording is enabled. 
+
+To verify ```/chatter``` messages were recorded, change to the ```bag_files/all_topics_bag``` directory as mentioned above and run:
+```
+ros2 bag info all_topics_bag
+```
+
+Alternatively, in one terminal run the ```listener``` using:
+```
+ros2 run beginner_tutorials listener
+```
+
+and in another terminal, play the recorded bag files, from the ```bag_files/all_topics_bag``` directory:
+```
+ros2 bag play all_topics_bag
+```
+
+
 ### Publisher-Subscriber
 
 In a terminal, navigate to your ROS2 workspace (```ros2_ws```) and source the setup files,
@@ -96,7 +151,7 @@ cd <path-to-ROS2-workspace>/ros2_ws
 ros2 launch beginner_tutorials pubsub_service_launch.yaml pub_freq:=10.0
 ```
 
-### Service 
+### Wk10: Service 
 
 In a new terminal, navigate to your ROS2 workspace (```ros2_ws```) and source the setup files. Launch the above publisher and subscriber nodes to run the server (Service: ```/update_message```) using, 
 ```
@@ -113,6 +168,7 @@ ros2 service call /update_message beginner_tutorials/srv/UpdateMessage "{data: U
 Enter ```Ctrl+c``` in each terminal to stop the nodes from spinning.
 
 ### Log Output
+
 Run the following to colorize the log outputs while using launching the nodes:
 ```
 export RCUTILS_COLORIZED_OUTPUT=1
