@@ -11,6 +11,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/**
+ * @file test_talker.cpp
+ * @author Adarsh Malapaka (adarshmalapaka98@gmail.com)
+ * @brief Level 2 integration Tests for Publisher and tf2.
+ * @version 0.1
+ * @date 2022-12-03
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 
 #include <chrono>
 #include <gtest/gtest.h>
@@ -25,11 +35,19 @@
 
 using namespace std::chrono_literals;
 
+/**
+ * @brief Class to contain the Talker test node
+ * 
+ */
 class TaskTalker : public testing::Test {
  protected:
   rclcpp::Node::SharedPtr node_;
 };
 
+/**
+ * @brief Test function to check existence of ROS2 publisher.
+ * 
+ */
 TEST_F(TaskTalker, test_num_publishers) {
   node_ = rclcpp::Node::make_shared("test_num_pubs");
   auto test_pub = node_->create_publisher<std_msgs::msg::String>
@@ -39,6 +57,10 @@ TEST_F(TaskTalker, test_num_publishers) {
   EXPECT_EQ(1, static_cast<int>(num_pub));
 }
 
+/**
+ * @brief Test function to check existence of tf2 transformation.
+ * 
+ */
 TEST_F(TaskTalker, test_tf2) {
   auto node_ = rclcpp::Node::make_shared("test_tf");
   auto tf_br = std::make_shared<tf2_ros::StaticTransformBroadcaster>(node_);
