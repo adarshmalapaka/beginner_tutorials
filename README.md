@@ -86,10 +86,11 @@ ros2 run beginner_tutorials talker
 In another terminal, source your ROS workspace as mentioned before and run:
 ros2 run tf2_ros tf2_echo world talk
 
-Alternatively, in a other terminal, you may run the folwogin and open the corresponding saved file ```frames.pdf```:
+Alternatively, in a other terminal, you may run the following and open the corresponding saved file in the ```frames.pdf```:
 ```
 ros2 run tf2_tools view_frames -o frames
 ```
+This file is saved in the ```results``` directory.
 
 ### Wk11: Level 2 GTests
 
@@ -97,6 +98,8 @@ To view the gtest results for the ROS2 publisher and tf2 broadcaster, run the fo
 ```
 colcon test --event-handlers console_direct+ --packages-select beginner_tutorials
 ```
+
+You should see 2 gtest cases to pass (one for publisher and another for tf2 broadcaster)
 
 ### Wk11: Rosbag
 
@@ -208,14 +211,14 @@ ros2 run rqt_console rqt_console
 
 Two screenshots of this window are provided in the ```/results``` directory.
 
-### cpplint 
+### cpplint (as of Wk11)
 Change to the root directory of the package, ```/beginner_tutorials```, and run:
 ```
 cpplint --filter=-build/c++11,+build/c++17,-build/namespaces,-build/include_order ./src/*.cpp ./include/beginner_tutorials/*.hpp > ./results/cpplint.txt
 ```
 The results of running ```cpplint``` can be found in ```/results/cpplint.txt```.
 
-### cppcheck
+### cppcheck (as of Wk11)
 Change to the root directory of the package, ```/beginner_tutorials```, and run:
 ```
 cppcheck --enable=all --std=c++17 ./src/*.cpp ./include/beginner_tutorials/*.hpp --suppress=missingIncludeSystem --suppress=unmatchedSuppression --suppress=unusedFunction --suppress=missingInclude --suppress=useInitializationList > results/cppcheck.txt
